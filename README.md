@@ -20,7 +20,7 @@ This project will continue to use the C++ development environment you set up in 
  ```
 
  2. Import the code into your IDE like done in the [Controls C++ project](https://github.com/udacity/FCND-Controls-CPP#development-environment-setup)
- 
+
  3. You should now be able to compile and run the estimation simulator just as you did in the controls project
 
 
@@ -85,6 +85,14 @@ For the controls project, the simulator was working with a perfect set of sensor
 
 3. Process the logged files to figure out the standard deviation of the the GPS X signal and the IMU Accelerometer X signal.
 
+#### Solution
+
+To compute the standard deviation of the sampled data, we first need its mean. The mean is computed by summing the samples weighted by the time between each sample, divided by the total time.
+
+The standard deviation is computed by taking the square root of the variance, which is given by the sum of (s-mean)^2 weighted by each dt (the time between each sample), divided by the total time.
+
+The computation is done using python in the notebook `src/sensorNoise.ipynb`. I find experimentally that the GPS has a standard deviation of 0.711 which is very close to the sensor standard deviation of 0.7. The IMU has a standard deviation of 0.49 found experimentally, which is again close from the true standard deviation of 0.5
+
 4. Plug in your result into the top of `config/6_Sensornoise.txt`.  Specially, set the values for `MeasuredStdDev_GPSPosXY` and `MeasuredStdDev_AccelXY` to be the values you have calculated.
 
 5. Run the simulator. If your values are correct, the dashed lines in the simulation will eventually turn green, indicating you’re capturing approx 68% of the respective measurements (which is what we expect within +/- 1 sigma bound for a Gaussian noise model)
@@ -108,6 +116,10 @@ Observe that there’s quite a bit of error in attitude estimation.
 ![attitude example](images/attitude-screenshot.png)
 
 In the screenshot above the attitude estimation using linear scheme (left) and using the improved nonlinear scheme (right). Note that Y axis on error is much greater on left.
+
+#### Solution
+
+To reduce the errors in the estimated attitude, I first convert the euler angles to quaternions. From these quaternions, I can integrate the body rate using the gyro measurements. Then I can convert these quaternions back into the euler angles. The yaw from the EKF state must be directly updated at that step.
 
 ***Success criteria:*** *Your attitude estimator needs to get within 0.1 rad for each of the Euler angles for at least 3 seconds.*
 
@@ -156,6 +168,12 @@ Another set of bad examples is shown below for having a `QVelXYStd` too large (f
 
 ***Success criteria:*** *This step doesn't have any specific measurable criteria being checked.*
 
+#### Solution
+
+For this step, I implemented the `PredictState()` function which receives as input the acceleration and the current state and returns the predicted state. As the acceleration is in the body frame, and that the state's pitch roll and yaw are in the inertial frame, I first convert the acceleration from the body frame into the inertial frame. Once done, I can integrate the positions using the velocities of the current state: position at time t+1 is the position at time t + dt * velocity. Same principle for the velocities: velocity at time t+1 is velocity at time t + acceleration * dt. Since dt is small, this simple approximation works. As the acceleration received in input does not include the gravity, I remove it from the acceleration in the inertial frame. As the yaw is updated in the IMU, it is not updated here.
+
+`RbgPrime()` is returning the derivative with respect to the yaw of the rotation matrix which rotates from the body frame into the inertial frame.
+![cov solution](images/covariance_estimation_my_solution.png)
 
 ### Step 4: Magnetometer Update ###
 

@@ -1,5 +1,5 @@
 ## Simulator specific ignores
-
+*.ipynb_checkpoints
 config/LastScenario.txt
 
 ## Ignore Visual Studio temporary files, build results, and

@@ -4,7 +4,7 @@
 # X=Y sets X to Y. Y may be a string, float, or list of 3 floats
 ############################################################################
 
-[QuadControlParams] 
+[QuadControlParams]
 
 UseIdealEstimator=1
 
@@ -18,21 +18,29 @@ kappa = 0.016
 minMotorThrust = .1
 maxMotorThrust = 4.5
 
+# Sergei Lupashin put together a one-page document deriving the ratio of velocity gains to position gains for a "critically damped" system (where the damping ratio is 1). In that document he shows that the ratio K_v / K_p = 4K for such a system.
+
 # Position control gains
-kpPosXY = 2
-kpPosZ = 2
-KiPosZ = 50
+# Between 1-4
+kpPosXY = 20
+kpPosZ = 13
+# Between 20-80
+KiPosZ = 40
 
 # Velocity control gains
-kpVelXY = 8
-kpVelZ = 8
+# Between 8 and 16
+kpVelXY = 12 # 15 # Should equal 4*kpPosXY
+kpVelZ = 18 # Should equal 4*kpPosZ
 
 # Angle control gains
-kpBank = 12
-kpYaw = 3
+# 10-20
+kpBank = 11
+# 2-4
+kpYaw = 1.3
 
 # Angle rate gains
-kpPQR = 70, 70, 15
+# 46-92, 46-92, 10-20
+kpPQR = 60, 60, 13
 
 # limits
 maxAscentRate = 5
